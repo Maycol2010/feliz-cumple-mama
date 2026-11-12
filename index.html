@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>¡Feliz Cumpleaños, Mamá! 🎂💖</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html {
+            width: 100%; height: 100%; overflow: hidden;
+            background-color: #030005;
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            user-select: none;
+        }
+
+        /* --- PANTALLA 1: SOBRE / CARTA CERRADA --- */
+        #pantalla-sobre {
+            position: fixed; inset: 0; z-index: 30;
+            background: radial-gradient(circle at center, #260319 0%, #030005 100%);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        .sobre-contenedor {
+            position: relative; width: 300px; height: 200px;
+            background: #ff007f; border-radius: 12px;
+            box-shadow: 0 0 45px rgba(255, 0, 127, 0.7);
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            transition: transform 0.3s ease;
+            animation: flotar 2.5s infinite ease-in-out;
+        }
+        .sobre-contenedor:hover { transform: scale(1.05); }
+        .sobre-solapa {
+            position: absolute; top: 0; left: 0; width: 0; height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 115px solid #ff4da6;
+            transform-origin: top;
+            transition: transform 0.6s ease;
+            z-index: 3;
+        }
+        .sobre-abierto .sobre-solapa { transform: rotateX(180deg); }
+        .sello-corazon {
+            position: relative; z-index: 4;
+            width: 60px; height: 60px; background: #fff;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            font-size: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            animation: latir 1.2s infinite;
+        }
+        .texto-tocar {
+            margin-top: 25px; font-size: 14px; letter-spacing: 2px;
+            color: #ff99cc; text-transform: uppercase;
+        }
+
+        /* --- PANTALLA 2: CARTA ABIERTA + FUEGOS ARTIFICIALES --- */
+        #pantalla-carta {
+            position: fixed; inset: 0; z-index: 20;
+            background: rgba(3, 0, 5, 0.92);
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 20px;
+            opacity: 0; transition: opacity 0.8s ease;
+        }
+        #contenido-carta {
+            display: flex; flex-direction: column; align-items: center;
+            transition: transform 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 1s ease;
+        }
+        .absorber-remolino {
+            transform: scale(0) rotate(720deg) !important;
+            opacity: 0 !important;
+        }
+        #canvas-fuegos {
+            position: absolute; inset: 0; z-index: -1; pointer-events: none;
+        }
+        .titulo-cursiva {
+            font-family: 'Great Vibes', cursive;
+            font-size: 56px; color: #ff4da6;
+            text-shadow: 0 0 25px rgba(255, 0, 127, 0.9);
+            margin-bottom: 10px;
+        }
+        .carta-papel {
+            background: rgba(255, 20, 147, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 0, 127, 0.55);
+            box-shadow: 0 0 35px rgba(255, 0, 127, 0.35);
+            border-radius: 20px; padding: 25px 20px;
+            max-width: 380px; margin: 15px 0 25px;
+        }
+        .carta-papel p {
+            font-size: 15px; line-height: 1.7; color: #ffe6f2;
+        }
+        .subtitulo-neon {
+            font-size: 12px; letter-spacing: 2px; color: #ff80bf;
+            margin-bottom: 18px; font-weight: 700;
+        }
+        .btn-neon {
+            background: linear-gradient(90deg, #ff007f, #b30059);
+            border: 1px solid #ff80bf; color: white; padding: 15px 42px;
+            font-size: 16px; font-weight: 700; border-radius: 50px;
+            letter-spacing: 2px; cursor: pointer;
+            box-shadow: 0 0 28px rgba(255, 0, 127, 0.85);
+            transition: transform 0.2s;
+        }
+        .btn-neon:active { transform: scale(0.95); }
+
+        /* --- TRANSICIÓN EN REMOLINO --- */
+        #canvas-remolino {
+            position: fixed; inset: 0; z-index: 25;
+            display: none; pointer-events: none;
+            opacity: 0; transition: opacity 0.4s ease;
+        }
+
+        /* --- PANTALLA 3: UNIVERSO 3D MAGENTA / FUCSIA --- */
+        #pantalla-universo {
+            position: fixed; inset: 0; z-index: 10;
+            display: none; opacity: 0;
+            transition: opacity 1s ease;
+        }
+        #titulo-superior-3d {
+            position: absolute; top: 25px; left: 0; width: 100%;
+            text-align: center; font-size: 20px; font-weight: 700;
+            letter-spacing: 2px; color: #ffb3d9;
+            text-shadow: 0 0 18px #ff007f, 0 0 30px #ff007f;
+            pointer-events: none; z-index: 12;
+        }
+        .instruccion-3d {
+            position: absolute; bottom: 20px; width: 100%;
+            text-align: center; font-size: 12px; color: rgba(255, 182, 217, 0.75);
+            pointer-events: none; z-index: 12;
+        }
+
+        /* --- MODAL DE RECUERDO / FOTO AL TOCAR CORAZÓN --- */
+        #modal-recuerdo {
+            position: fixed; inset: 0; z-index: 40;
+            background: rgba(5, 0, 8, 0.88);
+            backdrop-filter: blur(8px);
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            padding: 25px; text-align: center;
+        }
+        .modal-caja {
+            background: #1a0312; border: 1px solid #ff007f;
+            border-radius: 20px; padding: 22px; max-width: 350px; width: 100%;
+            box-shadow: 0 0 40px rgba(255, 0, 127, 0.6);
+            animation: zoomIn 0.3s ease;
+        }
+        .modal-foto {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 14px;
+            margin-bottom: 15px;
+            border: 2px solid #ff4da6;
+            box-shadow: 0 0 18px rgba(255, 0, 127, 0.45);
+        }
+        .modal-caja h3 { color: #ff66b2; margin-bottom: 10px; font-size: 20px; }
+        .modal-caja p { font-size: 14px; line-height: 1.6; color: #ffe6f2; margin-bottom: 20px; }
+        .btn-cerrar {
+            background: linear-gradient(90deg, #ff007f, #99004d);
+            border: none; color: white; padding: 10px 28px; border-radius: 20px;
+            cursor: pointer; font-size: 13px; font-weight: 600;
+        }
+
+        @keyframes flotar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes latir { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
+        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <!-- 1. PANTALLA DEL SOBRE -->
+    <div id="pantalla-sobre">
+        <div class="sobre-contenedor" id="sobre" onclick="abrirSobre()">
+            <div class="sobre-solapa"></div>
+            <div class="sello-corazon">💖</div>
+        </div>
+        <div class="texto-tocar">✨ Toca la carta para abrir ✨</div>
+    </div>
+
+    <!-- 2. PANTALLA DE LA CARTA ABIERTA -->
+    <div id="pantalla-carta">
+        <canvas id="canvas-fuegos"></canvas>
+        <div id="contenido-carta">
+            <div class="titulo-cursiva">Feliz Cumpleaños</div>
+            <div class="carta-papel">
+                <p>
+                    ¡Feliz cumpleaños, Mamá! 💖<br><br>
+                    Que tu día esté lleno de sonrisas, abrazos y sueños cumplidos. 
+                    Gracias por guiarme, cuidarme y ser siempre mi mayor ejemplo. 
+                    Eres el regalo más hermoso de mi vida. 🌹
+                </p>
+            </div>
+            <div class="subtitulo-neon">UN UNIVERSO TE ESPERA, HAZ CLIC EN INICIAR</div>
+            <button class="btn-neon" onclick="entrarAlUniverso()">INICIAR</button>
+        </div>
+    </div>
+
+    <!-- CANVAS DEL REMOLINO -->
+    <canvas id="canvas-remolino"></canvas>
+
+    <!-- 3. PANTALLA UNIVERSO 3D -->
+    <div id="pantalla-universo">
+        <div id="titulo-superior-3d">FELIZ CUMPLEAÑOS MAMÁ 🎂💖</div>
+        <div class="instruccion-3d">Desliza para girar • Toca los corazones brillantes</div>
+    </div>
+
+    <!-- 4. MODAL AL TOCAR CORAZONES (CON TUS FOTOS) -->
+    <div id="modal-recuerdo" onclick="cerrarModal()">
+        <div class="modal-caja" onclick="event.stopPropagation()">
+            <img class="modal-foto" id="modal-imagen" src="" alt="Recuerdo con mamá">
+            <h3 id="modal-titulo">¡Te amo mucho!</h3>
+            <p id="modal-texto">Gracias por estar siempre a mi lado.</p>
+            <button class="btn-cerrar" onclick="cerrarModal()">CERRAR ✕</button>
+        </div>
+    </div>
+
+    <!-- LIBRERÍA THREE.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        /* --- 1. LÓGICA DEL SOBRE Y FUEGOS ARTIFICIALES ROSA/FUCSIA --- */
+        function abrirSobre() {
+            const sobre = document.getElementById('sobre');
+            sobre.classList.add('sobre-abierto');
+            setTimeout(() => {
+                document.getElementById('pantalla-sobre').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('pantalla-sobre').style.display = 'none';
+                    const carta = document.getElementById('pantalla-carta');
+                    carta.style.display = 'flex';
+                    iniciarFuegosArtificiales();
+                    setTimeout(() => carta.style.opacity = '1', 50);
+                }, 600);
+            }, 500);
+        }
+
+        function iniciarFuegosArtificiales() {
+            const canvas = document.getElementById('canvas-fuegos');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let particulas = [];
+
+            const tonosRosa = ['#ff007f', '#ff4da6', '#ff99cc', '#ffffff', '#e60073'];
+            const intervalo = setInterval(() => {
+                if (document.getElementById('pantalla-carta').style.display === 'none') {
+                    clearInterval(intervalo);
+                    return;
+                }
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * (canvas.height * 0.6);
+                const color = tonosRosa[Math.floor(Math.random() * tonosRosa.length)];
+                for (let i = 0; i < 35; i++) {
+                    const ang = (Math.PI * 2 / 35) * i;
+                    const vel = Math.random() * 4 + 1;
+                    particulas.push({ x, y, vx: Math.cos(ang)*vel, vy: Math.sin(ang)*vel, alpha: 1, color });
+                }
+            }, 850);
+
+            function animarFuegos() {
+                if (document.getElementById('pantalla-carta').style.display === 'none') return;
+                ctx.fillStyle = 'rgba(3, 0, 5, 0.22)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                particulas.forEach((p, idx) => {
+                    p.x += p.vx; p.y += p.vy; p.vy += 0.04; p.alpha -= 0.018;
+                    ctx.globalAlpha = Math.max(p.alpha, 0);
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2); ctx.fill();
+                    if (p.alpha <= 0) particulas.splice(idx, 1);
+                });
+                requestAnimationFrame(animarFuegos);
+            }
+            animarFuegos();
+        }
+
+        /* --- 2. TRANSICIÓN EN REMOLINO MAGENTA --- */
+        function entrarAlUniverso() {
+            document.getElementById('contenido-carta').classList.add('absorber-remolino');
+
+            const canvas = document.getElementById('canvas-remolino');
+            canvas.style.display = 'block';
+            setTimeout(() => canvas.style.opacity = '1', 50);
+
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            const contenedor3D = document.getElementById('pantalla-universo');
+            contenedor3D.style.display = 'block';
+            construirEscena3D(contenedor3D);
+
+            const colores = ['#ff007f', '#ff4da6', '#ff99cc', '#ffffff', '#cc0066'];
+            const espiral = Array.from({ length: 240 }, (_, i) => ({
+                angulo: i * 0.25,
+                radio: Math.random() * Math.max(cx, cy) * 1.4,
+                velocidadAngular: 0.095 + Math.random() * 0.05,
+                velocidadExpansion: 2.6,
+                tamano: Math.random() * 3 + 1.5,
+                color: colores[i % colores.length]
+            }));
+
+            let frame = 0;
+            let modoAbrir = false;
+
+            function animarRemolino() {
+                frame++;
+                ctx.fillStyle = 'rgba(3, 0, 5, 0.22)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                if (frame === 65) {
+                    modoAbrir = true;
+                    document.getElementById('pantalla-carta').style.display = 'none';
+                    contenedor3D.style.opacity = '1';
+                }
+
+                espiral.forEach(p => {
+                    p.angulo += p.velocidadAngular;
+                    if (!modoAbrir) {
+                        p.radio *= 0.965;
+                        if (p.radio < 5) p.radio = Math.max(cx, cy) * 1.2;
+                    } else {
+                        p.radio += p.velocidadExpansion * 4.5;
+                    }
+
+                    const x = cx + Math.cos(p.angulo) * p.radio;
+                    const y = cy + Math.sin(p.angulo) * p.radio;
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = p.color;
+                    ctx.lineWidth = p.tamano;
+                    ctx.moveTo(x, y);
+                    const xPrev = cx + Math.cos(p.angulo - 0.35) * (p.radio * 0.92);
+                    const yPrev = cy + Math.sin(p.angulo - 0.35) * (p.radio * 0.92);
+                    ctx.lineTo(xPrev, yPrev);
+                    ctx.stroke();
+                });
+
+                if (frame < 110) {
+                    requestAnimationFrame(animarRemolino);
+                } else {
+                    canvas.style.opacity = '0';
+                    setTimeout(() => canvas.style.display = 'none', 400);
+                }
+            }
+            animarRemolino();
+        }
+
+        /* --- 3. UNIVERSO 3D ROSA / MAGENTA + TORTA NEÓN + CORAZONES 3D --- */
+        function construirEscena3D(contenedor) {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 14, 24);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            contenedor.appendChild(renderer.domElement);
+
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.75;
+
+            // 1. ESTRELLAS BLANCAS Y ROSADAS DE FONDO
+            const starGeo = new THREE.BufferGeometry();
+            const starPos = new Float32Array(2800 * 3);
+            const starColors = new Float32Array(2800 * 3);
+            for (let i = 0; i < 2800; i++) {
+                starPos[i * 3] = (Math.random() - 0.5) * 85;
+                starPos[i * 3 + 1] = (Math.random() - 0.5) * 85;
+                starPos[i * 3 + 2] = (Math.random() - 0.5) * 85;
+                const esRosa = Math.random() > 0.5;
+                starColors[i * 3] = 1.0;
+                starColors[i * 3 + 1] = esRosa ? 0.4 : 0.95;
+                starColors[i * 3 + 2] = esRosa ? 0.75 : 1.0;
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+            starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+            scene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.13, vertexColors: true })));
+
+            // 2. GALAXIA ESPIRAL EN TONOS FUCSIA, MAGENTA Y ROSA BRILLANTE
+            const galGeo = new THREE.BufferGeometry();
+            const count = 11000;
+            const pos = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+            const cCentro = new THREE.Color('#ffffff');
+            const cMedio = new THREE.Color('#ff007f');
+            const cBorde = new THREE.Color('#99004d');
+
+            for (let i = 0; i < count; i++) {
+                const r = Math.random() * 9.5;
+                const branchAngle = (i % 5) * ((Math.PI * 2) / 5);
+                const spinAngle = r * 0.95;
+                const dispersion = (Math.random() - 0.5) * 0.55 * r;
+
+                pos[i * 3] = Math.cos(branchAngle + spinAngle) * r + dispersion;
+                pos[i * 3 + 1] = (Math.random() - 0.5) * 0.25;
+                pos[i * 3 + 2] = Math.sin(branchAngle + spinAngle) * r + (Math.random() - 0.5) * 0.55 * r;
+
+                const mixedColor = r < 2.2
+                    ? cCentro.clone().lerp(cMedio, r / 2.2)
+                    : cMedio.clone().lerp(cBorde, (r - 2.2) / 7.3);
+
+                colors[i * 3] = mixedColor.r;
+                colors[i * 3 + 1] = mixedColor.g;
+                colors[i * 3 + 2] = mixedColor.b;
+            }
+            galGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            galGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            const galaxia = new THREE.Points(galGeo, new THREE.PointsMaterial({
+                size: 0.085, vertexColors: true, blending: THREE.AdditiveBlending, depthWrite: false
+            }));
+            scene.add(galaxia);
+
+            // 3. TORTA DE CUMPLEAÑOS NEÓN ROSA / MAGENTA EN EL CENTRO
+            const tortaGrupo = new THREE.Group();
+            const matNeonFucsia = new THREE.MeshBasicMaterial({ color: 0xff1493, wireframe: true });
+            const matBaseOscura = new THREE.MeshBasicMaterial({ color: 0x2b0018 });
+            const matAroBrillo = new THREE.MeshBasicMaterial({ color: 0xff80bf });
+
+            [
+                { r: 1.5, h: 0.9, y: 0.6 },
+                { r: 1.1, h: 0.8, y: 1.45 },
+                { r: 0.7, h: 0.7, y: 2.2 }
+            ].forEach(p => {
+                const geo = new THREE.CylinderGeometry(p.r, p.r, p.h, 28);
+                const solido = new THREE.Mesh(geo, matBaseOscura);
+                const borde = new THREE.Mesh(geo, matNeonFucsia);
+                const aroSup = new THREE.Mesh(new THREE.TorusGeometry(p.r, 0.025, 8, 36), matAroBrillo);
+                aroSup.rotation.x = Math.PI / 2;
+                aroSup.position.y = p.y + p.h / 2;
+
+                solido.position.y = borde.position.y = p.y;
+                tortaGrupo.add(solido, borde, aroSup);
+            });
+
+            // Velita rosa neón y llama brillante
+            const vela = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.5, 12), new THREE.MeshBasicMaterial({ color: 0xff99cc }));
+            vela.position.y = 2.8;
+            const llama = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffea75 }));
+            llama.position.y = 3.15;
+            tortaGrupo.add(vela, llama);
+            scene.add(tortaGrupo);
+
+            // 4. FRASES FLOTANDO EN LA GALAXIA (ESTILO DE LA IMAGEN)
+            const frases = [
+                "HOY CELEBRAMOS 💖", "FELIZ CUMPLEAÑOS ✨", "AMOR DE MI VIDA 💗",
+                "MI REFUGIO 🌹", "ERES MAGIA 👑", "TE AMO MAMÁ 💕"
+            ];
+            frases.forEach((texto, idx) => {
+                const canvasTxt = document.createElement('canvas');
+                canvasTxt.width = 512; canvasTxt.height = 128;
+                const ctx = canvasTxt.getContext('2d');
+                ctx.font = 'bold 32px Montserrat';
+                ctx.fillStyle = '#ffe6f2';
+                ctx.shadowColor = '#ff007f';
+                ctx.shadowBlur = 18;
+                ctx.textAlign = 'center';
+                ctx.fillText(texto, 256, 75);
+
+                const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvasTxt), transparent: true }));
+                const ang = (idx / frases.length) * Math.PI * 2;
+                sprite.position.set(Math.cos(ang) * 5.6, 0.55, Math.sin(ang) * 5.6);
+                sprite.scale.set(3.6, 0.9, 1);
+                scene.add(sprite);
+            });
+
+            // 5. CORAZONES 3D INTERACTIVOS (REEMPLAZAN A LOS PLANETAS)
+            function crearGeometriaCorazon() {
+                const shape = new THREE.Shape();
+                const x = 0, y = 0;
+                shape.moveTo(x, y + 0.25);
+                shape.bezierCurveTo(x, y + 0.25, x - 0.25, y, x - 0.5, y);
+                shape.bezierCurveTo(x - 0.85, y, x - 0.85, y + 0.45, x - 0.85, y + 0.45);
+                shape.bezierCurveTo(x - 0.85, y + 0.75, x - 0.55, y + 1.05, x, y + 1.35);
+                shape.bezierCurveTo(x + 0.55, y + 1.05, x + 0.85, y + 0.75, x + 0.85, y + 0.45);
+                shape.bezierCurveTo(x + 0.85, y + 0.45, x + 0.85, y, x + 0.5, y);
+                shape.bezierCurveTo(x + 0.25, y, x, y + 0.25, x, y + 0.25);
+
+                const geo = new THREE.ExtrudeGeometry(shape, {
+                    depth: 0.25, bevelEnabled: true, bevelSegments: 4, steps: 2, bevelSize: 0.08, bevelThickness: 0.08
+                });
+                geo.center();
+                geo.rotateZ(Math.PI); // Enderezar punta hacia abajo
+                return geo;
+            }
+
+            const corazonGeo = crearGeometriaCorazon();
+
+            // Aquí van tus 4 fotos (foto1.jpg, foto2.jpg, foto3.jpg, foto4.jpg)
+const recuerdos = [
+                { foto: "img/imagen1.jpg", titulo: "La Reina de la Casa", texto: "Gracias por cada sacrificio y por enseñarme a salir adelante siempre. ¡Feliz día, mamá!", color: 0xff007f },
+                { foto: "img/imagen2.jpg", titulo: "Amor Incondicional", texto: "No existen palabras suficientes para agradecerte todo lo que haces por mí cada día.", color: 0xff4da6 },
+                { foto: "img/imagen3.jpg", titulo: "Mis Mejores Deseos", texto: "Que Dios te llene de salud, alegría y muchos años más de vida junto a nosotros.", color: 0xe60073 },
+                { foto: "img/imagen4.jpg", titulo: "¡A Celebrar!", texto: "Hoy es tu día especial y mereces toda la felicidad del universo. ¡Te quiero muchísimo!", color: 0xff80bf }
+            ];
+            const corazonesInteractivos = [];
+            recuerdos.forEach((rec, idx) => {
+                const corazonMesh = new THREE.Mesh(
+                    corazonGeo,
+                    new THREE.MeshBasicMaterial({ color: rec.color })
+                );
+                // Borde brillante alrededor del corazón
+                const bordeCorazon = new THREE.Mesh(
+                    corazonGeo,
+                    new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
+                );
+                bordeCorazon.scale.set(1.06, 1.06, 1.06);
+                corazonMesh.add(bordeCorazon);
+
+                corazonMesh.scale.set(0.65, 0.65, 0.65);
+                const ang = (idx / recuerdos.length) * Math.PI * 2 + 0.4;
+                corazonMesh.position.set(Math.cos(ang) * 4.1, 1.6, Math.sin(ang) * 4.1);
+                corazonMesh.userData = rec;
+                scene.add(corazonMesh);
+                corazonesInteractivos.push(corazonMesh);
+            });
+
+            // Corazoncitos pequeños flotando por todo el espacio como en la imagen
+            for (let i = 0; i < 18; i++) {
+                const miniCorazon = new THREE.Mesh(
+                    corazonGeo,
+                    new THREE.MeshBasicMaterial({ color: i % 2 === 0 ? 0xff1a8c : 0xff80bf, transparent: true, opacity: 0.75 })
+                );
+                miniCorazon.scale.set(0.22, 0.22, 0.22);
+                const radio = 2.8 + Math.random() * 5.5;
+                const ang = Math.random() * Math.PI * 2;
+                miniCorazon.position.set(Math.cos(ang) * radio, 0.4 + Math.random() * 2.8, Math.sin(ang) * radio);
+                miniCorazon.rotation.y = Math.random() * Math.PI;
+                scene.add(miniCorazon);
+            }
+
+            // DETECTAR TOQUE EN LOS CORAZONES GRANDES PARA ABRIR FOTOS
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+            window.addEventListener('pointerdown', (e) => {
+                if (document.getElementById('modal-recuerdo').style.display === 'flex') return;
+                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                raycaster.setFromCamera(mouse, camera);
+                const hits = raycaster.intersectObjects(corazonesInteractivos);
+                if (hits.length > 0) {
+                    const data = hits[0].object.userData;
+                    document.getElementById('modal-imagen').src = data.foto;
+                    document.getElementById('modal-titulo').innerText = data.titulo;
+                    document.getElementById('modal-texto').innerText = data.texto;
+                    document.getElementById('modal-recuerdo').style.display = 'flex';
+                }
+            });
+
+            let zoomInicial = true;
+            function animate() {
+                requestAnimationFrame(animate);
+                if (zoomInicial) {
+                    camera.position.y += (6.5 - camera.position.y) * 0.04;
+                    camera.position.z += (11 - camera.position.z) * 0.04;
+                    if (Math.abs(camera.position.z - 11) < 0.1) zoomInicial = false;
+                }
+                galaxia.rotation.y += 0.002;
+                tortaGrupo.rotation.y -= 0.005;
+                llama.scale.setScalar(1 + Math.sin(Date.now() * 0.015) * 0.15);
+
+                corazonesInteractivos.forEach((c, i) => {
+                    c.position.y = 1.6 + Math.sin(Date.now() * 0.003 + i) * 0.25;
+                    c.rotation.y += 0.015;
+                });
+
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-recuerdo').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
